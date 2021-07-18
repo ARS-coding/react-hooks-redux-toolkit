@@ -1,3 +1,5 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'; 
+
 // Action Creators
 
 // async actions
@@ -36,38 +38,19 @@ const initialState = {
   status: "idle", // loading state
 };
 
-function catsReducer(state = initialState, action) {
-  switch (action.type) {
-    // sync actions
-    case "cats/catAdded":
-      return {
-        ...state,
-        entities: [...state.entities, action.payload],
-      };
-    case "cats/catUpdated":
-      return {
-        ...state,
-        entities: state.entities.map((cat) =>
-          cat.id === action.payload.id ? action.payload : cat
-        ),
-      };
+const catsSlice = createSlice({
+  name: "cats",
+  initialState,
+  reducers: {
+    catAdded(state, action) {
+      state.entities.push(action.payload);
+    },
 
-    // async actions
-    case "cats/fetchCats/pending":
-      return {
-        ...state,
-        status: "loading",
-      };
-    case "cats/fetchCats/fulfilled":
-      return {
-        ...state,
-        entities: action.payload,
-        status: "idle",
-      };
-
-    default:
-      return state;
+    catUpdated(state, action) {
+      const cat = state.entities.find((cat) => cat.id === action.payload.id);
+      cat.url = action.payload.url;
+    }
   }
-}
-
-export default catsReducer;
+})
+export const { catAdded, catUpdated } = catsSlice.reducers;
+export default catsSlice.reducer;
